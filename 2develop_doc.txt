@@ -8,10 +8,14 @@ git 仓库名 https://github.com/CuiFrank/ProjectGoal.git
 
 创建django项目
 django-admin startproject PlayerGoal
+创建应用
+python manage.py startapp goal
 
 
 
 创建mysql表过程
+
+u=root p=wx1231231
 
 mysql> create database PlayerGoal
 mysql> use PlayerGoal;
@@ -23,3 +27,7 @@ mysql> create table goal
     -> score int unsigned not null,
     -> primary key (id)
     -> ) engine=innodb default charset=utf8;
+
+python manage.py makemigrations
+python manage.py migrate
+使用数据表 goal_goal

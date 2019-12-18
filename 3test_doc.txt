@@ -1,0 +1,61 @@
+
+测试用例
+
+一.客户端上传端口号和分数接口-用例：
+	说明：为了简单，只是实现了get方式请求
+
+	1.测试上传，查看redis中是否有此客户记录，如果没有当前客户的记录，则向redis中插入zset中key为goal而且member为此客户name的值
+	请求url ： http://127.0.0.1:10000/player/goal/?name=%E5%AE%A2%E6%88%B7%E7%AB%AF12&score=29
+	连接上redis: zscore goal name(当前客户的名字，即客户端口号), 后期改为代码实现，如果是最新的值，说明成功，否则失败
+	连接上mysql: select * from goal_goal where name=name(当前客户的名字，即客户端口号), 后期改为代码实现，如果是最新的值，说明成功，否则失败
+	返回值为：{"code": 0, "detail": "name:\u5ba2\u6237\u7aef12,score:29,res_score:None,redis_detail:no this name , create in redis ...,mysql_detail:store mysql ok"}
+
+	2.测试上传，查看redis中是否有此客户记录，如果有当前客户的记录，再判定是否这次上传的score得分是否与redis中存储的值一样，如果一样，则不进行更新，如果不一样则进行redis更新，并更新mysql的score值
+	请求url ： http://127.0.0.1:10000/player/goal/?name=%E5%AE%A2%E6%88%B7%E7%AB%AF12&score=29
+	连接上redis: zscore goal name(当前客户的名字，即客户端口号), 后期改为代码实现，如果是最新的值，说明成功，否则失败
+	连接上mysql: select * from goal_goal where name=name(当前客户的名字，即客户端口号), 后期改为代码实现，如果是最新的值，说明成功，否则失败
+	返回值为：{"code": 0, "detail": "name:\u5ba2\u6237\u7aef12,score:29,res_score:29.0,redis_detail:redis val is equal to now, no need update,mysql_detail:no need store mysql"}
+
+	2.测试上传，查看redis中是否有此客户记录，如果有当前客户的记录，再判定是否这次上传的score得分是否与redis中存储的值一样，如果不一样则进行redis更新，并更新mysql的score值
+	请求url ： http://127.0.0.1:10000/player/goal/?name=%E5%AE%A2%E6%88%B7%E7%AB%AF12&score=28
+	连接上redis: zscore goal name(当前客户的名字，即客户端口号), 后期改为代码实现，如果是最新的值，说明成功，否则失败
+	连接上mysql: select * from goal_goal where name=name(当前客户的名字，即客户端口号), 后期改为代码实现，如果是最新的值，说明成功，否则失败
+	返回值为：{"code": 0, "detail": "name:\u5ba2\u6237\u7aef12,score:28,res_score:29.0,redis_detail:redis val is not equal to now, need update,mysql_detail:store mysql ok"}
+
+	3.测试上传，如果分数score不是整形数字，则返回错误
+	错误为{"detail": "\u53c2\u6570\u9519\u8bef\uff0c\u8bf7\u68c0\u67e5\u53c2\u6570", "code": 1}，请查看参数
+
+
+二. 客户端显示排行榜接口-用例：
+	说明：为了简单，只是实现了get方式请求，name暂时使用get请求传递，后期改为cookie,前提是默认客户name存在
+
+	1.测试显示排行榜，当没有用户上传时，排行榜为空，start为正整数，end为正整数，且end大于等于start
+	没有用户上传时，应显示data为空
+	url http://127.0.0.1:10000/player/rank/?name=%E5%AE%A2%E6%88%B7%E7%AB%AFtest&start=20&end=30
+	返回值 : {"detail": "", "code": 0, "data": []}
+
+	2.测试显示排行榜，当有用户上传时，但客户请求中的排名起始位置和终止位置之间没有满足的值，start为正整数，end为正整数，且end大于等于start
+	当只有14个客户已经上传时，应显示只有自己
+	url http://127.0.0.1:10000/player/rank/?name=%E5%AE%A2%E6%88%B7%E7%AB%AF11&start=20&end=30
+	返回值 :{"code": 0, "detail": "", "data": [[11, "\u5ba2\u6237\u7aef11", 30]]}
+
+	3.测试显示排行榜，当有用户上传时，但客户请求中的排名起始位置和终止位置之间只有部分满足的值，start为正整数，end为正整数，且end大于等于start
+	当只有14个客户已经上传时，应显示排名为10-20的客户
+	url http://127.0.0.1:10000/player/rank/?name=%E5%AE%A2%E6%88%B7%E7%AB%AF11&start=10&end=20
+	{"code": 0, "detail": "", "data": [[10, "\u5ba2\u6237\u7aef10", 75], [11, "\u5ba2\u6237\u7aef11", 30], [12, "\u5ba2\u6237\u7aef12", 28], [13, "bb", 12], [14, "aa", 12]]}
+
+	4.测试显示排行榜，当有用户上传时，但客户请求中的排名起始位置和终止位置之间有全部满足的值，start为正整数，end为正整数，且end大于等于start
+	当只有12个客户已经上传时，应显示排名为5-10的客户
+	url http://127.0.0.1:10000/player/rank/?name=%E5%AE%A2%E6%88%B7%E7%AB%AF11&start=5&end=10
+	返回值为：{"data": [[1, "\u5ba2\u6237\u7aef1", 9999999], [2, "\u5ba2\u6237\u7aef2", 9500112], [3, "\u5ba2\u6237\u7aef3", 9233333], [4, "\u5ba2\u6237\u7aef4", 5445444], [5, "\u5ba2\u6237\u7aef5", 3453452], [6, "\u5ba2\u6237\u7aef6", 2342342], [7, "\u5ba2\u6237\u7aef8", 66666], [8, "\u5ba2\u6237\u7aef7", 66666], [9, "\u5ba2\u6237\u7aef9", 76], [10, "\u5ba2\u6237\u7aef10", 75], [11, "\u5ba2\u6237\u7aef11", 30]], "code": 0, "detail": ""}
+
+	5.测试显示排行榜，start不是正整数，或end不是正整数，或end小于start
+	url http://127.0.0.1:10000/player/rank/?name=%E5%AE%A2%E6%88%B7%E7%AB%AF11&start=-5&end=-10
+	url http://127.0.0.1:10000/player/rank/?name=%E5%AE%A2%E6%88%B7%E7%AB%AF11&start=-5&end=10
+	url http://127.0.0.1:10000/player/rank/?name=%E5%AE%A2%E6%88%B7%E7%AB%AF11&start=5&end=-10
+	url http://127.0.0.1:10000/player/rank/?name=%E5%AE%A2%E6%88%B7%E7%AB%AF11&start=15&end=10
+	返回值为：{"data": "", "code": 1, "detail": "\u53c2\u6570\u9519\u8bef\uff0c\u8bf7\u68c0\u67e5\u53c2\u6570"}
+
+
+
+

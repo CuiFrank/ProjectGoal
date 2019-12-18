@@ -11,14 +11,27 @@
 2.api接口
 
 /player/goal/
-参数：
-name
-score
+请求参数：
+name string
+score int
+请求方式：
+get
+正式生产使用post,测试方便使用get
+返回参数：
+成功 {"code":0}
+失败 {"code":1}
+
 
 /player/rank/
-参数：
-start
-end
+请求参数：
+start int
+end int
+请求方式：
+get
+正式生产使用post,测试方便使用get
+返回参数：
+成功 {"code":0, "data":[{"name":"aa", "score":123}, {"name":"bb", "score":234},...]}
+失败 {"code":1}
 
 3.数据库
 mysql 数据表
