@@ -1,0 +1,31 @@
+
+1.设计思路
+上传功能：
+   每次客户端上传分数功能：都要先判定是否与redis中存储的分数是否一样，如果一样，则不进行跟新，也不进行mysql的update
+
+   name 是唯一标识，不能重复，上传时需要判定重复
+查询排名：
+   redis 使用zset, zadd score 分数 name
+
+
+2.api接口
+
+/player/goal/
+参数：
+name
+score
+
+/player/rank/
+参数：
+start
+end
+
+3.数据库
+mysql 数据表
+id name score
+1  客户a  3333
+
+redis 使用zset
+
+
+
