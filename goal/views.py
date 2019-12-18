@@ -6,7 +6,6 @@ from goal.models import Goal
 import django_redis
 CACHE = django_redis.get_redis_connection()
 
-import json
 
 def set_goal(request):
     # 返回值

@@ -1,9 +1,10 @@
 
 1.设计思路
 上传功能：
-   每次客户端上传分数功能：都要先判定是否与redis中存储的分数是否一样，如果一样，则不进行跟新，也不进行mysql的update
+   每次客户端上传分数功能：都要先判定是否与redis中存储的分数是否一样，如果一样，则不进行跟新，也不进行mysql的update,如果不一样，进行更新，
+       如果没有，则向redis和mysql中都进行插入
 
-   name 是唯一标识，不能重复，上传时需要判定重复
+   name 是唯一标识，不能重复，
 查询排名：
    redis 使用zset, zadd score 分数 name
 
@@ -18,20 +19,21 @@ score int
 get
 正式生产使用post,测试方便使用get
 返回参数：
-成功 {"code":0}
-失败 {"code":1}
+成功 {"code":0，"detail":""}
+失败 {"code":1，"detail":""}
 
 
 /player/rank/
 请求参数：
+name string
 start int
 end int
 请求方式：
 get
 正式生产使用post,测试方便使用get
 返回参数：
-成功 {"code":0, "data":[{"name":"aa", "score":123}, {"name":"bb", "score":234},...]}
-失败 {"code":1}
+成功 {"code":0, "data":[[], [],...], "detail": ""}
+失败 {"code":1, "data":[[], [],...], "detail": ""}
 
 3.数据库
 mysql 数据表

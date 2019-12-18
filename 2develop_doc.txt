@@ -17,17 +17,6 @@ python manage.py startapp goal
 
 u=root p=wx1231231
 
-mysql> create database PlayerGoal
-mysql> use PlayerGoal;
-Database changed
-mysql> create table goal
-    -> (
-    -> id int unsigned auto_increment,
-    -> name varchar(50) not null,
-    -> score int unsigned not null,
-    -> primary key (id)
-    -> ) engine=innodb default charset=utf8;
-
 python manage.py makemigrations
 python manage.py migrate
 使用数据表 goal_goal
